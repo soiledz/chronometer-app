@@ -1,0 +1,97 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  WORKER
+  MASTER
+  ADMIN
+}
+
+enum StageType {
+  PREPARATION
+  EXPOSURE
+  SETUP
+  PRINTING
+  WASHING
+}
+
+enum DayType {
+  WORKING
+  WEEKEND
+  COMPLETED
+}
+
+model Worker {
+  id          Int       @id @default(autoincrement())
+  telegramId  String    @unique
+  name        String
+  role        Role      @default(WORKER)
+  days        Day[]
+  tasks       Task[]
+  createdAt   DateTime  @default(now())
+}
+
+model Day {
+  id           Int       @id @default(autoincrement())
+  date         DateTime
+  type         DayType   @default(WORKING)
+  startTime    DateTime?
+  endTime      DateTime?
+  duration     Int?
+  efficiency   Float?
+  workerId     Int
+  worker       Worker    @relation(fields: [workerId], references: [id])
+  tasks        Task[]
+  createdAt    DateTime  @default(now())
+}
+
+model Norm {
+  id           Int        @id @default(autoincrement())
+  stageType    StageType  @unique
+  unitsPerHour Float
+  unitName     String
+  updatedAt    DateTime   @updatedAt
+}
+
+model Task {
+  id            Int          @id @default(autoincrement())
+  taskNumber    String
+  startTime     DateTime
+  endTime       DateTime?
+  totalDuration Int?
+  workerId      Int
+  worker        Worker       @relation(fields: [workerId], references: [id])
+  dayId         Int?
+  day           Day?         @relation(fields: [dayId], references: [id])
+  stages        Stage[]
+  extraWorks    ExtraWork[]
+  createdAt     DateTime     @default(now())
+}
+
+model Stage {
+  id           Int        @id @default(autoincrement())
+  taskId       Int
+  task         Task       @relation(fields: [taskId], references: [id])
+  stageType    StageType
+  startTime    DateTime?
+  endTime      DateTime?
+  duration     Int?
+  units        Int?
+  efficiency   Float?
+}
+
+model ExtraWork {
+  id        Int      @id @default(autoincrement())
+  taskId    Int
+  task      Task     @relation(fields: [taskId], references: [id])
+  name      String
+  startTime DateTime?
+  endTime   DateTime?
+  duration  Int?
+}

@@ -1,0 +1,8 @@
+{
+  "/api/workers/route": "app/api/workers/route.js",
+  "/api/days/active/route": "app/api/days/active/route.js",
+  "/api/days/route": "app/api/days/route.js",
+  "/api/tasks/route": "app/api/tasks/route.js",
+  "/api/norms/route": "app/api/norms/route.js",
+  "/page": "app/page.js"
+}
